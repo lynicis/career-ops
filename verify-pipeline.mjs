@@ -21,6 +21,7 @@
  * 16. No invisible control characters in tracker cells (error — see #3892)
  * 17. JD archive coverage — check-jd-archive.mjs's findings (warning/error — see #4525)
  * 18. Output filename standard — check-output-names.mjs's findings (warning — see #6667)
+ * 19. Tailored-CV summary matches its report's Section E framing (warning)
  *
  * Every error/warning is followed by a one-line `→ fix:` hint (#5796), printed
  * once per kind. Pass --no-hints for the bare, hint-free output.
@@ -49,6 +50,7 @@ import { checkFollowupsSchema } from './stats.mjs';
 import { loadCanonicalStates, stripStatusDecoration } from './tracker-utils.mjs';
 import { checkJdArchive } from './check-jd-archive.mjs';
 import { checkOutputNames } from './check-output-names.mjs';
+import { checkCvTailoring } from './check-cv-tailoring.mjs';
 import { machineSummarySection } from './lib/machine-summary-section.mjs';
 
 const USAGE = `Usage: node verify-pipeline.mjs [--no-hints]
@@ -893,6 +895,21 @@ if (outputNamesResult.findings.length === 0) {
   ok(outputNamesResult.checked === 0
     ? 'No report-numbered artifacts in output/ — nothing to check for the filename standard'
     : `All ${outputNamesResult.checked} report-numbered artifact(s) in output/ follow the filename standard`);
+}
+
+// --- Check 19: tailored-CV summary matches its report's framing ---
+// One aggregate warning, not one per artifact: a summary default that ignores
+// the role can mismatch dozens of renders at once, and the health check only
+// needs to say that something is wrong — check-cv-tailoring.mjs prints the
+// per-file list.
+const cvTailoringResult = checkCvTailoring(join(CAREER_OPS, 'output'), REPORTS_DIR);
+if (cvTailoringResult.findings.length > 0) {
+  warn(`${cvTailoringResult.findings.length} of ${cvTailoringResult.checked} tailored CV(s) open with a Professional Summary that contradicts the framing their own report asked for`,
+    'run node check-cv-tailoring.mjs for the per-file list; regenerate the CV so its summary matches Section E row 1 of its report');
+} else {
+  ok(cvTailoringResult.checked === 0
+    ? 'No report-numbered tailored CVs in output/ — nothing to check for summary framing'
+    : `All ${cvTailoringResult.checked} tailored CV(s) match their report's summary framing`);
 }
 
 // --- Summary ---
