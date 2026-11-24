@@ -1,0 +1,115 @@
+{
+  "results": [
+    {
+      "label": "First name",
+      "ok": true,
+      "got": "İsmail Emre"
+    },
+    {
+      "label": "Last name",
+      "ok": true,
+      "got": "Sırmalı"
+    },
+    {
+      "label": "Email",
+      "ok": true,
+      "got": "lynicis@protonmail.com"
+    },
+    {
+      "label": "Current location",
+      "ok": true,
+      "got": "Istanbul, Turkey"
+    },
+    {
+      "label": "Phone",
+      "ok": true,
+      "got": "+90 530 783 3831"
+    },
+    {
+      "label": "LinkedIn",
+      "ok": true,
+      "got": "linkedin.com/in/emresirmali"
+    },
+    {
+      "label": "GitHub",
+      "ok": true,
+      "got": "github.com/lynicis"
+    },
+    {
+      "label": "Portfolio",
+      "ok": true,
+      "got": "https://lynicis.dev"
+    },
+    {
+      "label": "If you selected \"Employee Referral\" or \"Other\", could you please specify?",
+      "ok": true,
+      "got": "Remotive"
+    },
+    {
+      "label": "Additional information",
+      "ok": true,
+      "got": "I answered \"no\" to the France work-authorization question: I"
+    },
+    {
+      "label": "We want team members who are passionate about our mission. If you’re excited about helping people live healthier and longer lives, tell us about a moment or experience that sparked your interest in healthcare.",
+      "ok": true,
+      "got": "I don't have a clinical background, so what draws me to heal"
+    },
+    {
+      "label": "Describe a specific project that you’re proud of where you had an impact across the stack. What made this project particularly meaningful or challenging for you as a full-stack developer?",
+      "ok": true,
+      "got": "Vorinfo, the AI-powered EdTech SaaS I built from zero to pro"
+    },
+    {
+      "label": "Resume upload",
+      "ok": true
+    },
+    {
+      "label": "Source: Other",
+      "ok": true
+    },
+    {
+      "label": "Are you currently able to legally work for any employer in France",
+      "ok": true,
+      "got": "No"
+    },
+    {
+      "label": "If you join us, would you work from Paris?",
+      "ok": true,
+      "got": "Yes"
+    },
+    {
+      "label": "Do you have a minimum of 3 years of experience as a Software Engineer?",
+      "ok": true,
+      "got": "Yes"
+    }
+  ],
+  "sweep": {
+    "missing": [],
+    "groups": {
+      "How did you hear about opportunities at Alan?": [
+        "Other"
+      ],
+      "Are you currently able to legally work for any employer in France": [
+        "No"
+      ],
+      "If you join us, would you work from Paris?": [
+        "Yes"
+      ],
+      "Do you have a minimum of 3 years of experience as a Software Engineer?": [
+        "Yes"
+      ]
+    }
+  }
+}
+READY_FOR_REVIEW
+node:internal/modules/run_main:111
+    triggerUncaughtException(
+    ^
+
+page.waitForTimeout: Target page, context or browser has been closed
+    at /Users/lynicis/Projects/career-ops/tmp/alan-fill.mjs:142:14 {
+  log: []
+}
+
+Node.js v26.13.1

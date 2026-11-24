@@ -1,0 +1,42 @@
+{
+  "state": "filled",
+  "date": "2026-11-24",
+  "freeText": [
+    {
+      "question": "We want team members who are passionate about our mission. If you're excited about helping people live healthier and longer lives, tell us about a moment or experience that sparked your interest in healthcare.",
+      "answer": "I don't have a clinical background, so what draws me to healthcare is the cost of being wrong. Building Vorinfo, an AI assessment platform for students, taught me that a model which is 90% right in a demo and 90% right in production are different products. Students acted on the output, and a wrong answer had a real consequence, which pushed me toward evaluation, guardrails and human-in-the-loop design instead of impressive demos.\n\nHealthcare is the hardest version of that problem: the stakes are higher, the data is messier, and the product has to earn trust from people who are not thinking about software at all. Mo interests me because it is not a chatbot bolted onto a website. It runs inside an insurer at real scale, so the hard engineering sits in safety, triage, and handing off to a human when the model is uncertain. That is the kind of problem I want to spend the next few years on."
+    },
+    {
+      "question": "Describe a specific project that you're proud of where you had an impact across the stack. What made this project particularly meaningful or challenging for you as a full-stack developer?",
+      "answer": "Vorinfo, the AI-powered EdTech SaaS I built from zero to production in four months as its sole technical founder. I owned the whole stack: data modelling, a TypeScript/Node.js backend (Fastify, ConnectRPC), a Nuxt.js front end, a LangChain pipeline that generated assessments from source material, and the AWS infrastructure plus CI/CD that shipped it multiple times a day.\n\nWhat made it hard was not any single layer. The LLM layer had to produce structured, gradable questions a teacher could use without rewriting them, which meant designing orchestration, validation and retries around the model instead of trusting a prompt. The product layer had to keep editing fast, because the real constraint was a teacher's time, and quiz creation ended up about 70% faster. The infrastructure had to stay boring enough that one person could operate it while also talking to users.\n\nBuilding alone forces you to make every trade-off yourself and then live with it in production, which is exactly the part I want more of."
+    },
+    {
+      "question": "Additional information",
+      "answer": "I answered \"no\" to the France work-authorization question: I am based in Istanbul and would need a French work permit. I am willing to relocate to Paris if the role supports it, and I would like to understand which entity would employ the role."
+    },
+    {
+      "question": "If you selected \"Employee Referral\" or \"Other\", could you please specify?",
+      "answer": "Remotive"
+    }
+  ],
+  "selections": [
+    { "question": "How did you hear about opportunities at Alan?", "answer": "Other" },
+    { "question": "Are you currently able to legally work for any employer in France", "answer": "No" },
+    { "question": "If you join us, would you work from Paris?", "answer": "Yes" },
+    { "question": "Do you have a minimum of 3 years of experience as a Software Engineer?", "answer": "Yes" }
+  ],
+  "fieldValues": [
+    { "field": "First name", "value": "İsmail Emre" },
+    { "field": "Last name", "value": "Sırmalı" },
+    { "field": "Email", "value": "lynicis@protonmail.com" },
+    { "field": "Current location", "value": "Istanbul, Turkey" },
+    { "field": "Phone", "value": "+90 530 783 3831" },
+    { "field": "LinkedIn", "value": "linkedin.com/in/emresirmali" },
+    { "field": "GitHub", "value": "github.com/lynicis" },
+    { "field": "Portfolio", "value": "https://lynicis.dev" },
+    { "field": "Current company", "value": "(left blank)" }
+  ],
+  "files": [
+    { "kind": "Resume", "path": "output/276-alan-cv-ismail-emre-sirmali-2026-11-24.pdf" }
+  ]
+}
