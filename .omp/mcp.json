@@ -4,6 +4,32 @@
     "linkedin": {
       "type": "http",
       "url": "http://127.0.0.1:8000/mcp"
+    },
+    "fiverr": {
+      "type": "http",
+      "url": "https://mcp.fiverr.com/mcp"
+    },
+    "upwork": {
+      "type": "http",
+      "url": "https://mcp.upwork.com/mcp",
+      "auth": {
+        "type": "oauth",
+        "credentialId": "mcp_oauth:profile:default:https://mcp.upwork.com/mcp",
+        "tokenUrl": "https://www.upwork.com/api/v3/oauth2/token",
+        "resource": "https://mcp.upwork.com/mcp",
+        "clientId": "389cf9ec9b6c24bb716d6412c960c55f"
+      }
+    },
+    "freelancer.com": {
+      "type": "http",
+      "url": "https://mcp.freelancer.com/mcp",
+      "auth": {
+        "type": "oauth",
+        "credentialId": "mcp_oauth:profile:default:https://mcp.freelancer.com/mcp",
+        "tokenUrl": "https://mcp.freelancer.com/oauth/token",
+        "resource": "https://mcp.freelancer.com/mcp",
+        "clientId": "LiwzbgDFzdonf0q4nzf8rg"
+      }
     }
   }
 }

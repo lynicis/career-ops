@@ -5,6 +5,15 @@
     },
     "linkedin": {
       "url": "http://127.0.0.1:8000/mcp"
+    },
+    "fiverr": {
+      "serverUrl": "https://mcp.fiverr.com/mcp"
+    },
+    "freelancer.com": {
+      "serverUrl": "https://mcp.freelancer.com/mcp"
+    },
+    "upwork": {
+      "serverUrl": "https://mcp.upwork.com/mcp"
     }
   }
 }
