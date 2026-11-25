@@ -4,7 +4,13 @@
       "url": "https://freehire.me/api/v1/mcp"
     },
     "linkedin": {
-      "url": "http://127.0.0.1:8000/mcp"
+      "command": "uvx",
+      "args": [
+        "mcp-server-linkedin@latest"
+      ],
+      "env": {
+        "UV_HTTP_TIMEOUT": "300"
+      }
     },
     "fiverr": {
       "serverUrl": "https://mcp.fiverr.com/mcp"
