@@ -59,3 +59,25 @@ ambiguous location wording may withhold an eligible role; review the original
 posting before changing your policy. The policy belongs in user-owned
 `portals.yml`; updates preserve it, and no existing Inbox/history rows are
 rewritten automatically.
+
+## Foreign office and hybrid roles
+
+`location_filter.foreign_onsite_support` is an optional additional gate for
+people who need both relocation assistance and work-visa sponsorship to take a
+foreign office or hybrid role:
+
+```yaml
+location_filter:
+  foreign_onsite_support:
+    enabled: true
+```
+
+Recognized remote roles bypass this gate and keep existing eligibility rules.
+Foreign office/hybrid roles pass only when the posting text contains a
+recognized relocation offer and explicit visa-sponsorship language. Explicit
+refusals win; missing location, work mode, or support evidence fails closed.
+Relocation phrase lists can be overridden with `relocation_positive` and
+`relocation_negative`. This conservative text match can miss differently worded
+offers and does not establish that an employer will approve a visa or benefit.
+It affects scanner eligibility only; the generic liveness check still reports
+whether a posting appears open, not whether it suits a candidate.

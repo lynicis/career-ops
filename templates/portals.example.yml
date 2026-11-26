@@ -278,6 +278,19 @@
 #     - "Brazil"
 #     - "Australia"
 
+# Foreign office/hybrid jobs can require explicit relocation AND visa sponsorship:
+#
+# location_filter:
+#   foreign_onsite_support:
+#     enabled: true
+#     # Optional overrides; defaults recognize common relocation offers/refusals.
+#     # relocation_positive: ["relocation assistance", "relocation package"]
+#     # relocation_negative: ["no relocation", "relocation is not offered"]
+#
+# This gate leaves recognized remote roles unchanged. Foreign office/hybrid roles
+# without both statements, or with unknown work mode, are excluded. This is a
+# text check, not confirmation that a visa or relocation benefit will be approved.
+
 # Conditional office/hybrid-city + remote-country rules are also opt-in:
 # location_filter.workplace_policy (see docs/WORKPLACE_GEOGRAPHY.md). Unlike
 # an allow entry of "Remote", this checks where remote applicants may work.

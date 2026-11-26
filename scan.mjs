@@ -806,11 +806,67 @@ const WORLDWIDE_LOCATION_LABELS = new Set([
 const GENERIC_REMOTE_ALLOW = new Set(['remote', 'remote work', 'work from home', 'anywhere', 'distributed']);
 const US_STATE_NAMES = new Set(USPS_STATES.map(([name]) => name).filter(name => !US_STATE_NAMES_ALSO_COUNTRIES.has(name)));
 const US_STATE_NAME_MATCHERS = [...US_STATE_NAMES].map(compileLocationKeyword);
+// Detect common refusal constructions around relocation without treating
+// unrelated later sentences as a refusal of an earlier offer.
+const RELOCATION_REFUSAL_RE = /\brelocation\b[^.!?;]{0,60}\b(?:not\s+(?:offered|provided|available|included|supported|possible)|(?:is|are)\s+not\s+(?:offered|provided|available|included|supported|possible)|(?:is|are)\s+(?:unavailable|unsupported|impossible)|(?:will|would)\s+not\s+(?:be\s+)?(?:offered|provided|available|included|supported)|(?:isn't|aren't|can't|cannot|won't|wouldn't)\s+(?:be\s+)?(?:offered|provided|available|included|supported|possible))\b|\b(?:do|does|did|will|would|can|could)\s+not\s+(?:provide|offer|include|support|cover|assist|fund)\b[^.!?;]{0,60}\brelocation\b|\b(?:can't|cannot|won't|wouldn't|don't|doesn't|didn't)\b[^.!?;]{0,60}\brelocation\b/i;
 
 // `url` and `title` are optional. Callers that omit them get the original
 // location-only semantics, which is what the existing unit tests exercise.
-export function buildLocationFilter(locationFilter) {
-  if (!locationFilter) return () => true;
+export function buildForeignOnsiteSupportFilter(config, candidateCountry = loadCandidateCountry()) {
+  if (!config || config.enabled !== true) return () => ({ eligible: true, reason: '' });
+  const home = homeCountryCodes([candidateCountry]);
+  const relocationPositive = normalizeKeywordList(config.relocation_positive ?? [
+    'relocation assistance', 'relocation support', 'relocation package',
+    'relocation provided', 'relocation available', 'assistance with relocation',
+    'support with relocation',
+  ]);
+  const relocationNegative = normalizeKeywordList(config.relocation_negative ?? [
+    'no relocation', 'without relocation', 'relocation is not offered',
+    'relocation is not available', 'relocation will not be provided',
+    'relocation is not provided', 'relocation assistance is not provided',
+    'relocation assistance is not offered', 'relocation assistance is not available',
+    'relocation assistance will not be provided', 'relocation support is not provided',
+    'relocation support is not offered', 'relocation support is not available',
+    'relocation package is not provided', 'relocation package is not offered',
+    'do not provide a relocation', 'do not offer a relocation',
+    "don't provide a relocation", "don't offer a relocation",
+    'will not provide relocation', 'will not offer relocation',
+  ]).map(foldApostrophes);
+  const sponsorshipFilter = buildVisaFilter({ require_mention: true });
+  return (offer, fallbackLocation, fallbackTitle) => {
+    const workplaceType = normalizeWorkplaceType(offer?.workplaceType ?? offer?.workplace_type);
+    const locationValue = typeof offer?.location === 'string' && offer.location.trim()
+      ? offer.location
+      : fallbackLocation;
+    const location = typeof locationValue === 'string' ? locationValue.trim() : '';
+    const title = typeof offer?.title === 'string' ? offer.title : fallbackTitle;
+    if (workplaceType === 'remote' || titleSignalsRemote(title) || titleSignalsRemote(location)) {
+      return { eligible: true, reason: '' };
+    }
+    if (!home.size) return { eligible: false, reason: 'candidate_country_missing' };
+    if (!location) return { eligible: false, reason: 'location_missing' };
+    if (!namesPlaceOutsideHome(location, home)) return { eligible: true, reason: '' };
+    if (workplaceType !== 'onsite' && workplaceType !== 'hybrid') {
+      return { eligible: false, reason: 'workplace_type_unknown' };
+    }
+    const text = foldApostrophes([offer?.description, offer?.visaText]
+      .filter(value => typeof value === 'string' && value.trim())
+      .join('\n').toLowerCase());
+    if (relocationNegative.some(keyword => text.includes(keyword))
+        || RELOCATION_REFUSAL_RE.test(text)
+        || !relocationPositive.some(keyword => text.includes(keyword))) {
+      return { eligible: false, reason: 'missing_relocation_support' };
+    }
+    if (!sponsorshipFilter(visaFilterText(offer))) {
+      return { eligible: false, reason: 'missing_visa_sponsorship' };
+    }
+    return { eligible: true, reason: '' };
+  };
+}
+
+export function buildLocationFilter(locationFilter, candidateCountry = loadCandidateCountry()) {
+  if (!locationFilter) return Object.assign(() => true, { foreignOnsiteSupport: () => ({ eligible: true, reason: '' }) });
+  const foreignOnsiteSupport = buildForeignOnsiteSupportFilter(locationFilter.foreign_onsite_support, candidateCountry);
   const workplacePolicy = buildWorkplacePolicy(locationFilter.workplace_policy);
   const alwaysAllowKeywords = normalizeKeywordList(locationFilter.always_allow).map(foldLocationWhitespace);
   const alwaysAllow = compileLocationKeywordList(locationFilter.always_allow, { stateNameSkipsDc: true });
@@ -850,6 +906,7 @@ export function buildLocationFilter(locationFilter) {
     && (allow.length > 0 || block.length > 0 || blockHard.length > 0);
 
   const filter = (location, url, title, offer) => {
+    if (!foreignOnsiteSupport(offer, location, title).eligible) return false;
     if (!workplacePolicy(location, title, offer).eligible) return false;
     const original = typeof location === 'string' ? foldLocationWhitespace(location).trim() : '';
     const lower = original.toLowerCase();
@@ -896,6 +953,7 @@ export function buildLocationFilter(locationFilter) {
   // location tiers. Arbitrary caller-provided filters have no such capability.
   return Object.assign(filter, {
     workplacePolicyOnly: (location, url, title, offer) => workplacePolicy(location, title, offer).eligible,
+    foreignOnsiteSupport,
   });
 }
 
@@ -5618,6 +5676,7 @@ async function main() {
   const declaredFieldSeen = new Map();
   const declaredFieldAbsent = new Map();
   let totalFilteredLocation = 0;
+  let totalFilteredForeignOnsiteSupport = 0;
   let totalFilteredPostingAge = 0;
   let totalFilteredPostedDate = 0;
   let totalFilteredSalary = 0;
@@ -5912,6 +5971,9 @@ async function main() {
         const employerRejected = company._isBoard && employerLocationRejected.has(locationUrl)
           && !employerLocationAccepted.has(locationUrl);
         if (employerRejected || !locationFilter(job.location, job.url, job.title, job)) {
+          if (!employerRejected && !locationFilter.foreignOnsiteSupport(job).eligible) {
+            totalFilteredForeignOnsiteSupport++;
+          }
           if (!company._isBoard) employerLocationRejected.add(locationUrl);
           totalFilteredLocation++;
           st.location++;
@@ -6342,6 +6404,9 @@ async function main() {
   if (config.location_filter || totalFilteredLocation > 0) {
     console.log(`Filtered by location:  ${totalFilteredLocation} removed`);
   }
+  if (totalFilteredForeignOnsiteSupport > 0) {
+    console.log(`Foreign onsite support missing: ${totalFilteredForeignOnsiteSupport} removed`);
+  }
   if (config.max_posting_age_days != null || totalFilteredPostingAge > 0) {
     console.log(`Filtered by age:       ${totalFilteredPostingAge} removed`);
   }
@@ -6671,6 +6736,7 @@ async function main() {
       skipped: skippedCount,
       found: totalFound,
       filtered,
+      filtered_foreign_onsite_support: totalFilteredForeignOnsiteSupport,
       duplicates: totalDupes,
       added: verifiedOffers.length,
       added_urls: verifiedOffers.map(offer => offer.url),

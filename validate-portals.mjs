@@ -437,6 +437,26 @@ export async function validatePortalsConfig(config, { providerIds = new Set() } 
       if (config.location_filter.remote_title_fallback !== undefined && typeof config.location_filter.remote_title_fallback !== 'boolean') {
         add(errors, 'location_filter.remote_title_fallback', 'must be a boolean when set');
       }
+      if (config.location_filter.foreign_onsite_support !== undefined) {
+        const support = config.location_filter.foreign_onsite_support;
+        const supportPath = 'location_filter.foreign_onsite_support';
+        if (!isObject(support)) {
+          add(errors, supportPath, 'must be an object');
+        } else {
+          rejectUnknownFields(support, supportPath, ['enabled', 'relocation_positive', 'relocation_negative'], errors);
+          if (support.enabled !== undefined && typeof support.enabled !== 'boolean') {
+            add(errors, `${supportPath}.enabled`, 'must be a boolean when set');
+          }
+          for (const key of ['relocation_positive', 'relocation_negative']) {
+            if (support[key] === undefined || support[key] === null) continue;
+            if (!Array.isArray(support[key])) {
+              add(errors, `${supportPath}.${key}`, 'must be a list of non-empty strings');
+              continue;
+            }
+            validateKeywordList(support[key], `${supportPath}.${key}`, errors);
+          }
+        }
+      }
     }
   }
 
